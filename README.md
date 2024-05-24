@@ -123,7 +123,7 @@ Download all the datasets used in our paper from the 🤗 Hub. You may want to u
 huggingface-cli download camlab-ethz/<DATASET IDENTIFIER FROM PAPER> --repo-type dataset --local-dir <LOCAL DIRECTORY>
 ```
 
-This will download a specific dataset to the specified `LOCAL DIRECTORY`. After download, you need to assemble the datasets to the format expected by the code; for that, we refer to the README in the respective dataset repository. After assembly, remove the chunked dataset files, as they are not needed for training, and place the assembled dataset at the path you specify as `--data_path` for the training/inference script.
+This will download a specific dataset to the specified `LOCAL DIRECTORY`. After download, you need to assemble the datasets to the format expected by the code; for that, we refer to the README in the respective dataset repository. After assembly, remove the chunked dataset files, as they are not needed for training, and place the assembled dataset at the path you specify as `--data_path` for the training/inference script. You may also specify the 🤗 Hub cache location by specifying the environment variable `HF_HOME` as this is where the download will be performed to.
 
 ### Adding your own dataset
 
