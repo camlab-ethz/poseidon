@@ -1,0 +1,57 @@
+project: <WANDB_PROJECT>
+entity: <WANDB_ENTITY>
+program: scOT/train.py
+method: grid
+metric:
+  name: "eval/loss"
+  goal: minimize
+command:
+  - "HDF5_USE_FILE_LOCKING=FALSE"
+  - "accelerate" 
+  - "launch"
+  - ${program}
+  - "--disable_tqdm"
+  - "--json-config"
+  - "--finetune_from"
+  - "camlab-ethz/Poseidon-B"
+  - "--replace_embedding_recovery"
+  - "--config"
+  - ${args_json}
+parameters:
+  dataset:
+    value: "wave.Layer"
+  num_trajectories:
+    values:
+      - 1
+      - 2
+      - 4
+      - 8
+      - 16
+      - 32
+      - 64
+      - 128
+      - 256
+      - 512
+      - 1024
+  model_name:
+    value: "B"
+  lr:
+    value: 0.00005
+  lr_embedding_recovery:
+    value: 0.0005
+  lr_time_embedding:
+    value: 0.0005
+  weight_decay:
+    value: 0.000001
+  lr_scheduler:
+    value: "cosine"
+  warmup_ratio:
+    value: 0.0
+  early_stopping_patience:
+    value: 200
+  num_epochs:
+    value: 200
+  batch_size:
+    value: 40
+  max_grad_norm:
+    value: 5.0

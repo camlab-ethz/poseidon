@@ -1,0 +1,20 @@
+[project]
+name = "scOT"
+version = "1.0.0"
+description = "Foundation models for PDEs based on a scalable Operator Transformer"
+dependencies = [
+    "torch",
+    "torchvision",
+    "numpy",
+    "transformers",
+    "matplotlib",
+    "accelerate",
+    "wandb",
+    "h5py",
+    "pandas",
+    "pyyaml",
+]
+
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
