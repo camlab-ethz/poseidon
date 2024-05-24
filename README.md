@@ -37,7 +37,7 @@ To finetune and replace embeddings and recovery parameters, load the model as fo
 ```python
 from scOT.models import ScOT
 
-model = ScOT.from_pretrained("camlab-ethz/Poseidon-<MODEL_SIZE>", config= model_config, ignore_mismatched_sizes=True)
+model = ScOT.from_pretrained("camlab-ethz/Poseidon-<MODEL_SIZE>", config=model_config, ignore_mismatched_sizes=True)
 ```
 
 Here, `model_config` is a `ScOTConfig` with the correct input/output dimensions. We also refer to [the training/finetuning script](scOT/train.py), see below on usage, which might be easier.
