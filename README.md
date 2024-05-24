@@ -27,7 +27,7 @@ To use the (pretrained) models in your own code, you can use the following code 
 ```python
 from scOT.models import ScOT
 
-model = scOT.from_pretrained("camlab-ethz/Poseidon-<MODEL_SIZE>")
+model = ScOT.from_pretrained("camlab-ethz/Poseidon-<MODEL_SIZE>")
 ```
 
 This will load the pretrained model from the 🤗 Hub. `<MODEL_SIZE>` has to be replaced by `T`, `B`, or `L`, for the respective pretrained model. You can also load a model from a local path by providing the path to the `from_pretrained` method.
