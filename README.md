@@ -1,6 +1,6 @@
 # Poseidon: Efficient Foundation Models for PDEs
 
-This is the source code for the paper [*Poseidon: Efficient Foundation Models for PDEs*](TODO). It also acts as a package if you want to use the models in your code.
+This is the source code for the paper [*Poseidon: Efficient Foundation Models for PDEs*](https://arxiv.org/abs/2405.19101). It also acts as a package if you want to use the models in your code.
 
 ![Poseidon](assets/fig1.png)
 
@@ -140,5 +140,12 @@ Pretrained models are available on the 🤗 Hub, see the [Poseidon collection](h
 If you use our models, code, or datasets, please consider citing our paper:
 
 ```bibtex
-TODO
+@misc{herde2024poseidon,
+      title={Poseidon: Efficient Foundation Models for PDEs}, 
+      author={Maximilian Herde and Bogdan Raonić and Tobias Rohner and Roger Käppeli and Roberto Molinaro and Emmanuel de Bézenac and Siddhartha Mishra},
+      year={2024},
+      eprint={2405.19101},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
