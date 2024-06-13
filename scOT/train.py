@@ -277,7 +277,7 @@ if __name__ == "__main__":
     train_config = TrainingArguments(
         output_dir=ckpt_dir,
         overwrite_output_dir=True,  #! OVERWRITE THIS DIRECTORY IN CASE, also for resuming training
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",
         per_device_train_batch_size=config["batch_size"],
         per_device_eval_batch_size=config["batch_size"],
         eval_accumulation_steps=16,
