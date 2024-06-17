@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Poseidon: Efficient Foundation Models for PDEs">
+    <meta name="keywords" content="foundation models, PDEs, operators, sample efficiency">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Poseidon: Efficient Foundation Models for PDEs</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="./assets/css/bulma.min.css">
+    <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./assets/css/index.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./assets/js/fontawesome.all.min.js"></script>
+    <script src="./assets/js/bulma-carousel.min.js"></script>
+    <script src="./assets/js/bulma-slider.min.js"></script>
+    <script src="./assets/js/index.js"></script>
+</head>
+
+<body>
+    <nav class="navbar is-transparent is-fixed-top glass-overlay" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-start" style="flex-grow: 1; justify-content: left; padding-left: 10pt;">
+                <a class="navbar-item" href="#Home">Home</a>
+                <a class="navbar-item" href="#Summary">Summary </a>
+                <!--
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link" href="#Results">Results</a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="#SampleEfficiency">Sample Efficiency</a>
+                        <a class="navbar-item" href="#Accuracy">Accuracy</a>
+                        <a class="navbar-item" href="#CaseStudies">Case Studies</a>
+                    </div>
+                </div>
+                -->
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link" href="#Datasets">PDEgym</a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="#Time-dependent">Time-dependent Problems</a>
+                        <a class="navbar-item" href="#Time-independent">Time-independent Problems</a>
+                    </div>
+                </div>
+                <!--
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link" href="#method">Method </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="#architecture">Architecture </a>
+                        <a class="navbar-item" href="#all2all">all2all Training </a>
+                    </div>
+                </div>
+                -->
+                <a class="navbar-item" href="#Usage">Usage</a>
+                <a class="navbar-item" href="#Citation">Cite</a>
+            </div>
+            <div class="navbar-end" style="display: none; justify-content: right; padding-right: 10pt;" id="icon-links">
+                <a class="navbar-item" href="https://arxiv.org/abs/2405.19101" target="_blank">
+                    <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                    </span>
+                </a>
+                <a class="navbar-item" href="https://github.com/camlab-ethz/poseidon" target="_blank">
+                    <span class="icon">
+                        <i class="fab fa-github"></i>
+                    </span>
+                </a>
+                <a class="navbar-item" href="https://huggingface.co/camlab-ethz" target="_blank">
+                    <span class="icon">
+                        🤗
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const iconLinks = document.getElementById('icon-links');
+            const homeSection = document.querySelector('#Home');
+
+            window.addEventListener('scroll', () => {
+                const homePosition = homeSection.getBoundingClientRect().bottom;
+                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+                // Check if the bottom of the Home section is above the top of the viewport
+                if (homePosition <= 0) {
+                    iconLinks.style.display = 'flex';
+                } else {
+                    iconLinks.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+
+    <section class="hero is-fullheight" id="Home">
+        <div class="hero-body reverse-gradient">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered is-vcentered"></div>
+                <div class="column has-text-centered">
+                    <h1 class="title is-1 publication-title">
+                        🧜‍♂️ Poseidon: Efficient Foundation Models for PDEs
+                    </h1>
+                    <div class="is-size-5 publication-authors">
+                        <span class="author-block">
+                            Maximilian Herde<sup>1,*</sup>,</span>
+                        <span class="author-block">
+                            Bogdan Raonić<sup>1,2,*</sup>,</span>
+                        <span class="author-block">
+                            Tobias Rohner<sup>1</sup>,
+                        </span>
+                        <span class="author-block">
+                            Roger Käppeli<sup>1</sup>,
+                        </span>
+                        <span class="author-block">
+                            Roberto Molinaro<sup>1</sup>,
+                        </span>
+                        <span class="author-block">
+                            Emmanuel de Bézenac<sup>1</sup>,
+                        </span>
+                        <span class="author-block">
+                            Siddhartha Mishra<sup>1,2</sup>
+                        </span>
+                    </div>
+
+                    <div class="is-size-6 publication-authors">
+                        <span class="author-block"><sup>1</sup>Seminar for Applied Mathematics, ETH Zurich,
+                            Switzerland,</span>
+                        <span class="author-block"><sup>2</sup>ETH AI Center, Zurich, Switzerland,</span>
+                        <span class="author-block"><sup>*</sup>Equal contribution</span>
+                    </div>
+
+                    <div class="column has-text-centered">
+                        <div class="publication-links">
+                            <span class="link-block">
+                                <a href="https://arxiv.org/abs/2405.19101"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        <i class="ai ai-arxiv"></i>
+                                    </span>
+                                    <span>Paper</span>
+                                </a>
+                            </span>
+                            <!-- Code Link. -->
+                            <span class="link-block">
+                                <a href="https://github.com/camlab-ethz/poseidon"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        <i class="fab fa-github"></i>
+                                    </span>
+                                    <span>Code</span>
+                                </a>
+                            </span>
+                            <!-- Dataset Link. -->
+                            <span class="link-block">
+                                <a href="https://huggingface.co/collections/camlab-ethz/poseidon-664fa125729c53d8607e209a"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        🤗
+                                    </span>
+                                    <span>Pretrained Models & Pretraining Data</span>
+                                </a>
+                            </span>
+                            <!-- Dataset Link. -->
+                            <span class="link-block">
+                                <a href="https://huggingface.co/collections/camlab-ethz/poseidon-downstream-tasks-664fa237cd6b0c097971ef14"
+                                    class="external-link button is-normal is-rounded is-dark">
+                                    <span class="icon">
+                                        🤗
+                                    </span>
+                                    <span>Downstream Tasks</span>
+                                </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="arrow-container" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);">
+                <div class="arrow"></div>
+            </div>
+            <script>
+                window.addEventListener('scroll', function () {
+                    const scrollPosition = window.scrollY;
+                    const windowHeight = window.innerHeight;
+                    const fadePoint = windowHeight / 2; // Start fading at half the viewport height
+
+                    const arrowContainer = document.querySelector('.arrow-container');
+
+                    if (scrollPosition < fadePoint) {
+                        const opacity = 1 - (scrollPosition / fadePoint);
+                        arrowContainer.style.opacity = opacity;
+                    } else {
+                        arrowContainer.style.opacity = 0;
+                    }
+                });
+            </script>
+        </div>
+        </div>
+    </section>
+
+    <!--
+    <section class="teaser" id="Summary">
+        <div class="container is-max-desktop">
+            <h1 class="title">Summary</h2>
+                <p> Here we give a summary, contributions etc. Maybe the abstract.</p>
+        </div>
+    </section>
+    -->
+
+    <section class="hero-body" id="Figure 1">
+        <div class="container is-max-desktop content">
+            <img src="assets/fig1.png" alt="Figure 1">
+        </div>
+    </section>
+
+    <!--
+    <section class="section" id="Results">
+        <div class="container is-max-desktop content">
+            <h1 class="title">Results</h1>
+            <p>Write something general about results here.</p>
+            <div class="columns is-centered">
+                <div class="column" id="SampleEfficiency">
+                    <h2 class="subtitle">Sample Efficiency</h2>
+                    <p>Write about sample efficiency with some plot? and the table (only with EG).</p>
+                </div>
+            </div>
+            <div class="columns is-centered">
+                <div class="column" id="Accuracy">
+                    <h2 class="subtitle">Accuracy</h2>
+                    <p>Write about accuracy with plot? + AG table.</p>
+                </div>
+            </div>
+            <div class="columns is-centered">
+                <div class="column" id="CaseStudies">
+                    <h2 class="subtitle">A Deep Dive into some Downstream Tasks</h2>
+                    <p>Case studies.</p>
+                </div>
+    </section>
+    -->
+
+    <section class="section" id="Datasets">
+        <div class="container is-max-desktop content" id="Time-dependent">
+            <h1 class="title">PDEgym</h2>
+                <p>We introduce PDEgym, a collection of datasets consisting of multiple PDEs and operators.</p>
+                <div class="field">
+                    <p>Use the dropdown menu below to see visualizations of samples of time-dependent datasets with
+                        normalized time.
+                    </p>
+                    <div class="control">
+                        <div class="select">
+                            <select id="video-select">
+                                <option value="" disabled>--- Pretraining Datasets ---</option>
+                                <option value="assets/videos/CE-RP.mp4">CE-RP</option>
+                                <option value="assets/videos/CE-CRP.mp4">CE-CRP</option>
+                                <option value="assets/videos/CE-KH.mp4">CE-KH</option>
+                                <option value="assets/videos/CE-Gauss.mp4">CE-Gauss</option>
+                                <option value="assets/videos/NS-Sines.mp4">NS-Sines</option>
+                                <option value="assets/videos/NS-Gauss.mp4">NS-Gauss</option>
+                                <option value="" disabled>--- Downstream Tasks ---</option>
+                                <option value="assets/videos/NS-PwC.mp4">NS-PwC</option>
+                                <option value="assets/videos/NS-SVS.mp4">NS-SVS</option>
+                                <option value="assets/videos/NS-BB.mp4">NS-BB</option>
+                                <option value="assets/videos/NS-SL.mp4">NS-SL</option>
+                                <option value="assets/videos/FNS-KF.mp4">FNS-KF</option>
+                                <option value="assets/videos/CE-RPUI.mp4">CE-RPUI</option>
+                                <option value="assets/videos/CE-RM.mp4">CE-RM</option>
+                                <option value="assets/videos/GCE-RT.mp4">GCE-RT</option>
+                                <option value="assets/videos/Wave-Layer.mp4">Wave-Layer</option>
+                                <option value="assets/videos/Wave-Gauss.mp4">Wave-Gauss</option>
+                                <option value="assets/videos/ACE.mp4">ACE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <video id="selected-video" controls loop autoplay>
+                    <source id="video-source" src="assets/videos/CE-RP.mp4" type="video/mp4">
+                </video>
+        </div>
+    </section>
+
+    <script>
+        const videoSelect = document.getElementById('video-select');
+        const selectedVideo = document.getElementById('selected-video');
+        const videoSource = document.getElementById('video-source');
+
+        videoSelect.addEventListener('change', function () {
+            const selectedOption = videoSelect.options[videoSelect.selectedIndex];
+            const videoUrl = selectedOption.value;
+            videoSource.src = videoUrl;
+            selectedVideo.load();
+        });
+    </script>
+    </code></pre>
+    </div>
+    <div class="container is-max-desktop content" id="Time-independent">
+        <div class="field">
+            <p>Use the dropdown menu
+                below to see visualizations of samples of time-independent datasets. The top row corresponds to
+                inputs, the bottom to outputs. For Helmholtz, the number below each sample is the value of the
+                Dirichlet boundary condition.
+            </p>
+            <div class="control">
+                <div class="select">
+                    <select id="image-select">
+                        <option value="" disabled>--- Select an image ---</option>
+                        <option value="assets/poisson_gaussians.pdf">Poisson-Gauss</option>
+                        <option value="assets/helmholtz.pdf">Helmholtz</option>
+                        <option value="assets/airfoil.pdf">SE-AF</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="has-text-centered">
+            <img id="selected-image" src="assets/poisson_gaussians.pdf" alt="Selected Image" style="max-width: 100%;">
+        </div>
+    </div>
+    </div>
+    </section>
+
+    <script>
+        const imageSelect = document.getElementById('image-select');
+        const selectedImage = document.getElementById('selected-image');
+        imageSelect.addEventListener('change', function () {
+            const selectedOption = imageSelect.options[imageSelect.selectedIndex];
+            const imageUrl = selectedOption.value;
+            selectedImage.src = imageUrl;
+        });
+    </script>
+    </section>
+
+    <!--
+    <section class="hero-body" id="Method">
+        <div class="container is-max-desktop content">
+            <h1 class="title">Method</h1>
+            <p>Here we describe the method. Maybe we can have subsections for architecture and all2all training.</p>
+            <div class="columns is-centered" id="architecture">
+                <div class="column">
+                    <h2 class="subtitle">Architecture</h2>
+                    <p>Here you can describe the architecture of your model.</p>
+                </div>
+            </div>
+            <div class="columns is-centered" id="all2all">
+                <div class="column">
+                    <h2 class="subtitle">all2all Training</h2>
+                    <p>Here you can describe the all2all training.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    -->
+
+    <section class="hero-body" id="Usage">
+        <div class="container is-max-desktop">
+            <h1 class="title">Usage</h1>
+            <p>We encourage using our pretrained models on your own datasets. To that end, you can directly plug your
+                dataset into our code and then finetune using our scripts.
+                With your data at hand, you may follow these steps:</p>
+            <ol>
+                <li>
+                    Put your dataset in an appropriate directory. Then, write a dataset class in a file in the
+                    <code>scOT/problems</code> subfolder of the code that inherits
+                    from <code class="python">BaseDataset</code> or <code class="python">BaseTimeDataset</code> in
+                    <code>scOT/problems/base.py</code>, depending on whether your problem is time-independent or
+                    time-dependent, respectively. Make sure to also pass <code class="python">*args, **kwargs</code>
+                    as arguments. A minimal example of which fields have to be set additionally can be seen in the
+                    snippet below (for a time-dependent problem).
+                    <pre><code class="python">
+class MyDataset(BaseTimeDataset):
+    def __init__(self, *args, **kwargs):
+        # the following arguments are inherited:
+        # which: str, can be train, val, or test, depending on the split to get
+        # num_trajectories: int, number of trajectories/samples in the training set to get
+        # data_path: str, path to the data directory
+        # move_to_local_scratch: str, set to a directory that offers higher bandwidth, if applicable, data will be copied there before training
+        # max_num_time_steps: int, maximum number of time steps to consider (only relevant for time-dependent)
+        # time_step_size: int, time step size (only relevant for time-dependent)
+        # fix_input_to_time_step: int, if set, the input will be fixed to this time step (only relevant for time-dependent)
+        # allowed_time_transitions: list of int, allowed time transitions, if you don't want to use full all2all (only relevant for time-dependent)
+        super().__init__(*args, **kwargs)
+
+        self.N_max = None # maximum number of trajectories/samples in full dataset
+        self.N_val = None # number of validation samples
+        self.N_test = None # number of test samples
+
+        self.input_dim = None # input dimensionality for the model
+        self.label_description = None # a str build as "[channel1],[channel2,channel3]" 
+        # where channel1, channel2, channel3 are the output channels 
+        # named as channel1, channel2, channel3; channel2 and channel3 will be interpreted 
+        # as a vectorized function in the loss and evaluation
+
+        # you may want to call self._move_to_local_scratch(path_to_dataset) 
+        # if you want to allow copying before opening the dataset
+
+        self.post_init()
+    
+    # __len__() is inherited and does not need to be implemented
+
+    def __getitem__(self, idx):
+        i, t, t1, t2 = self._idx_map(idx) # for time-dependent problems: i is the trajectory, t the lead time, t1 the initial time, t2 the final time
+
+        # get your data using i + self.start for the trajectory, idx + self.start for the sample in the time-independent case
+        
+        # return a dict with input, output, lead time (in case of time-dependent problems)
+        # inputs should have shape (self.input_dim, resolution, resolution)
+        # outputs should have shape (output_dim, resolution, resolution)
+        return {"pixel_values": inputs, "labels": outputs, "time": time}
+                </code></pre>
+                    After implementing the dataset, you may add it to the getter method <code
+                        class="python">get_dataset</code> in <code>scOT/problems/base.py</code> such that a string
+                    can
+                    identify the dataset - this is used by the training script. You may also add default settings
+                    there.
+                </li>
+                <li>Write your own configuration file, see the examples in the <code>configs</code> subdirectory.</li>
+                <li>Run the finetuning/training script to finetune the model on your dataset.
+                    <pre><code class="bash">
+accelerate launch scOT/train.py \
+    --config YOUR_WANDB_CONFIG_FILE \
+    --wandb_run_name WANDB_RUN_NAME \
+    --wandb_project_name WANDB_PROJECT_NAME \
+    --checkpoint_path CHECKPOINT_PATH \
+    --data_path DATA_PATH \
+    --finetune_from PRETRAINED_MODEL \
+    --replace_embedding_recovery SET ONLY IF EMBED/RECOVERY NEEDS TO BE REPLACED
+                    </code></pre>
+                    The script will automatically log to <a href="https://wandb.ai">Weights & Biases</a> and save the
+                    best
+                    model to the checkpoint path.
+                </li>
+            </ol>
+        </div>
+    </section>
+
+
+    <section class="hero-body" id="Citation">
+        <div class="container is-max-desktop">
+            <h1 class="title">Cite</h1>
+            <p>If you find our work useful, please cite our paper:</p>
+            <pre><code>
+@misc{herde2024poseidon,
+    title={Poseidon: Efficient Foundation Models for PDEs}, 
+    author={Maximilian Herde and Bogdan Raonić and Tobias Rohner and Roger Käppeli and Roberto Molinaro and Emmanuel de Bézenac and Siddhartha Mishra},
+    year={2024},
+    eprint={2405.19101},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+            </code></pre>
+        </div>
+    </section>
+
+
+    <footer class="footer gradient">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    This website is based on the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies
+                        website template</a>, which is licensed under a <a rel="license"
+                        href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+                        Commons Attribution-ShareAlike 4.0 International License</a>.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
