@@ -407,7 +407,8 @@ if __name__ == "__main__":
     )
 
     trainer.train(resume_from_checkpoint=params.resume_training)
-
+    trainer.save_model(train_config.output_dir)
+    
     if (RANK == 0 or RANK == -1) and params.push_to_hf_hub is not None:
         model.push_to_hub(params.push_to_hf_hub)
 
