@@ -260,41 +260,41 @@
 
     <section class="section" id="Datasets">
         <div class="container is-max-desktop content" id="Time-dependent">
-            <h1 class="title">PDEgym</h2>
-                <p>We introduce PDEgym, a collection of datasets consisting of multiple PDEs and operators.</p>
-                <div class="field">
-                    <p>Use the dropdown menu below to see visualizations of samples of time-dependent datasets with
-                        normalized time.
-                    </p>
-                    <div class="control">
-                        <div class="select">
-                            <select id="video-select">
-                                <option value="" disabled>--- Pretraining Datasets ---</option>
-                                <option value="assets/videos/CE-RP.mp4">CE-RP</option>
-                                <option value="assets/videos/CE-CRP.mp4">CE-CRP</option>
-                                <option value="assets/videos/CE-KH.mp4">CE-KH</option>
-                                <option value="assets/videos/CE-Gauss.mp4">CE-Gauss</option>
-                                <option value="assets/videos/NS-Sines.mp4">NS-Sines</option>
-                                <option value="assets/videos/NS-Gauss.mp4">NS-Gauss</option>
-                                <option value="" disabled>--- Downstream Tasks ---</option>
-                                <option value="assets/videos/NS-PwC.mp4">NS-PwC</option>
-                                <option value="assets/videos/NS-SVS.mp4">NS-SVS</option>
-                                <option value="assets/videos/NS-BB.mp4">NS-BB</option>
-                                <option value="assets/videos/NS-SL.mp4">NS-SL</option>
-                                <option value="assets/videos/FNS-KF.mp4">FNS-KF</option>
-                                <option value="assets/videos/CE-RPUI.mp4">CE-RPUI</option>
-                                <option value="assets/videos/CE-RM.mp4">CE-RM</option>
-                                <option value="assets/videos/GCE-RT.mp4">GCE-RT</option>
-                                <option value="assets/videos/Wave-Layer.mp4">Wave-Layer</option>
-                                <option value="assets/videos/Wave-Gauss.mp4">Wave-Gauss</option>
-                                <option value="assets/videos/ACE.mp4">ACE</option>
-                            </select>
-                        </div>
+            <h1 class="title">PDEgym</h1>
+            <p>We introduce PDEgym, a collection of datasets consisting of multiple PDEs and operators.</p>
+            <div class="field">
+                <p>Use the dropdown menu below to see visualizations of samples of time-dependent datasets with
+                    normalized time.
+                </p>
+                <div class="control">
+                    <div class="select">
+                        <select id="video-select">
+                            <option value="" disabled>--- Pretraining Datasets ---</option>
+                            <option value="assets/videos/CE-RP.mp4">CE-RP</option>
+                            <option value="assets/videos/CE-CRP.mp4">CE-CRP</option>
+                            <option value="assets/videos/CE-KH.mp4">CE-KH</option>
+                            <option value="assets/videos/CE-Gauss.mp4">CE-Gauss</option>
+                            <option value="assets/videos/NS-Sines.mp4">NS-Sines</option>
+                            <option value="assets/videos/NS-Gauss.mp4">NS-Gauss</option>
+                            <option value="" disabled>--- Downstream Tasks ---</option>
+                            <option value="assets/videos/NS-PwC.mp4">NS-PwC</option>
+                            <option value="assets/videos/NS-SVS.mp4">NS-SVS</option>
+                            <option value="assets/videos/NS-BB.mp4">NS-BB</option>
+                            <option value="assets/videos/NS-SL.mp4">NS-SL</option>
+                            <option value="assets/videos/FNS-KF.mp4">FNS-KF</option>
+                            <option value="assets/videos/CE-RPUI.mp4">CE-RPUI</option>
+                            <option value="assets/videos/CE-RM.mp4">CE-RM</option>
+                            <option value="assets/videos/GCE-RT.mp4">GCE-RT</option>
+                            <option value="assets/videos/Wave-Layer.mp4">Wave-Layer</option>
+                            <option value="assets/videos/Wave-Gauss.mp4">Wave-Gauss</option>
+                            <option value="assets/videos/ACE.mp4">ACE</option>
+                        </select>
                     </div>
                 </div>
-                <video id="selected-video" controls loop autoplay>
-                    <source id="video-source" src="assets/videos/CE-RP.mp4" type="video/mp4">
-                </video>
+            </div>
+            <video id="selected-video" controls loop autoplay>
+                <source id="video-source" src="assets/videos/CE-RP.mp4" type="video/mp4">
+            </video>
         </div>
     </section>
 
@@ -310,31 +310,31 @@
             selectedVideo.load();
         });
     </script>
-    </code></pre>
-    </div>
-    <div class="container is-max-desktop content" id="Time-independent">
-        <div class="field">
-            <p>Use the dropdown menu
-                below to see visualizations of samples of time-independent datasets. The top row corresponds to
-                inputs, the bottom to outputs. For Helmholtz, the number below each sample is the value of the
-                Dirichlet boundary condition.
-            </p>
-            <div class="control">
-                <div class="select">
-                    <select id="image-select">
-                        <option value="" disabled>--- Select an image ---</option>
-                        <option value="assets/poisson_gaussians.pdf">Poisson-Gauss</option>
-                        <option value="assets/helmholtz.pdf">Helmholtz</option>
-                        <option value="assets/airfoil.pdf">SE-AF</option>
-                    </select>
+
+    <section class="section">
+        <div class="container is-max-desktop content" id="Time-independent">
+            <div class="field">
+                <p>Use the dropdown menu
+                    below to see visualizations of samples of time-independent datasets. The top row corresponds to
+                    inputs, the bottom to outputs. For Helmholtz, the number below each sample is the value of the
+                    Dirichlet boundary condition.
+                </p>
+                <div class="control">
+                    <div class="select">
+                        <select id="image-select">
+                            <option value="" disabled>--- Select an image ---</option>
+                            <option value="assets/poisson_gaussians.png">Poisson-Gauss</option>
+                            <option value="assets/helmholtz.png">Helmholtz</option>
+                            <option value="assets/airfoil.png">SE-AF</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            <div class="has-text-centered">
+                <img id="selected-image" src="assets/poisson_gaussians.png" alt="Selected Image"
+                    style="max-width: 100%;">
+            </div>
         </div>
-        <div class="has-text-centered">
-            <img id="selected-image" src="assets/poisson_gaussians.pdf" alt="Selected Image" style="max-width: 100%;">
-        </div>
-    </div>
-    </div>
     </section>
 
     <script>
