@@ -1,15 +1,15 @@
 [project]
 name = "scOT"
-version = "1.0.0"
+version = "1.0.1"
 description = "Foundation models for PDEs based on a scalable Operator Transformer"
 dependencies = [
-    "torch == 2.0.1",
-    "torchvision == 0.15.2",
+    "torch >= 2.0.1",
+    "torchvision >= 0.15.2",
     "numpy",
-    "transformers == 4.29.2",
+    "transformers >= 4.29.2",
     "matplotlib",
-    "accelerate == 0.31.0",
-    "wandb == 0.14.2",
+    "accelerate >= 0.31.0",
+    "wandb >= 0.14.2",
     "h5py",
     "pandas",
     "pyyaml",
