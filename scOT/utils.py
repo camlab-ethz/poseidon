@@ -75,7 +75,8 @@ def read_cli(parser):
     )
     parser.add_argument(
         "--move_data",
-        str=None,
+        type=str,
+        default=None,
         help="If set, moves the data to this directory and trains from there.",
     )
     return parser
