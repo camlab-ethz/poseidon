@@ -45,7 +45,7 @@
         <div class="navbar-menu">
             <div class="navbar-start" style="flex-grow: 1; justify-content: left; padding-left: 10pt;">
                 <a class="navbar-item" href="#Home">Home</a>
-                <a class="navbar-item" href="#Summary">Summary </a>
+                <a class="navbar-item" href="#openseadragon">Summary </a>
                 <!--
                 <div class="navbar-item has-dropdown is-hoverable">
                     <a class="navbar-link" href="#Results">Results</a>
@@ -227,11 +227,23 @@
     </section>
     -->
 
+    <!--
     <section class="hero-body" id="Figure 1">
         <div class="container is-max-desktop content">
             <img src="assets/fig1.png" alt="Figure 1">
         </div>
     </section>
+    -->
+    <div class="section" id="openseadragon" class="hero-body">
+    </div>
+    <script src="/assets/openseadragon-bin-5.0.0/openseadragon.min.js"></script>
+    <script type="text/javascript">
+        const viewer = OpenSeadragon({
+            id: "openseadragon",
+            prefixUrl: "/assets/openseadragon-bin-5.0.0/images/",
+            tileSources: '/assets/poseidon_poster_tiles.dzi'
+        });
+    </script>
 
     <!--
     <section class="section" id="Results">
