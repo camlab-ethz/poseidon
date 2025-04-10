@@ -403,6 +403,11 @@ class ScOTLayer(nn.Module):
         self.intermediate = Swinv2Intermediate(config, dim)
         self.output = Swinv2Output(config, dim)
         self.layernorm_after = layer_norm(dim, eps=config.layer_norm_eps)
+        
+        # Cache for attention masks
+        self.attn_mask_cache = {}
+        # Cache for padding calculations
+        self.pad_cache = {}
 
     def set_shift_and_window_size(self, input_resolution):
         target_window_size = (
@@ -435,6 +440,11 @@ class ScOTLayer(nn.Module):
         )
 
     def get_attn_mask(self, height, width, dtype):
+        # Use cached attention mask when possible
+        cache_key = (height, width, self.shift_size, self.window_size, dtype)
+        if cache_key in self.attn_mask_cache:
+            return self.attn_mask_cache[cache_key]
+            
         if self.shift_size > 0:
             # calculate attention mask for shifted window multihead self attention
             img_mask = torch.zeros((1, height, width, 1), dtype=dtype)
@@ -462,13 +472,29 @@ class ScOTLayer(nn.Module):
             ).masked_fill(attn_mask == 0, float(0.0))
         else:
             attn_mask = None
+            
+        # Cache the result
+        self.attn_mask_cache[cache_key] = attn_mask
         return attn_mask
 
     def maybe_pad(self, hidden_states, height, width):
+        # Use cached padding calculations when possible
+        cache_key = (height, width, self.window_size)
+        if cache_key in self.pad_cache:
+            pad_values = self.pad_cache[cache_key]
+            if pad_values[3] > 0 or pad_values[5] > 0:
+                hidden_states = nn.functional.pad(hidden_states, pad_values)
+            return hidden_states, pad_values
+            
         pad_right = (self.window_size - width % self.window_size) % self.window_size
         pad_bottom = (self.window_size - height % self.window_size) % self.window_size
         pad_values = (0, 0, 0, pad_right, 0, pad_bottom)
-        hidden_states = nn.functional.pad(hidden_states, pad_values)
+        
+        # Cache the pad values
+        self.pad_cache[cache_key] = pad_values
+        
+        if pad_right > 0 or pad_bottom > 0:
+            hidden_states = nn.functional.pad(hidden_states, pad_values)
         return hidden_states, pad_values
 
     def forward(
@@ -482,17 +508,17 @@ class ScOTLayer(nn.Module):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         if not always_partition:
             self.set_shift_and_window_size(input_dimensions)
-        else:
-            pass
+            
         height, width = input_dimensions
-        batch_size, _, channels = hidden_states.size()
+        batch_size, seq_len, channels = hidden_states.size()
         shortcut = hidden_states
 
-        # pad hidden_states to multiples of window size
+        # Reshape and pad in one step if needed
         hidden_states = hidden_states.view(batch_size, height, width, channels)
         hidden_states, pad_values = self.maybe_pad(hidden_states, height, width)
         _, height_pad, width_pad, _ = hidden_states.shape
-        # cyclic shift
+        
+        # Only apply cyclic shift if needed
         if self.shift_size > 0:
             shifted_hidden_states = torch.roll(
                 hidden_states, shifts=(-self.shift_size, -self.shift_size), dims=(1, 2)
@@ -500,55 +526,53 @@ class ScOTLayer(nn.Module):
         else:
             shifted_hidden_states = hidden_states
 
-        # partition windows
-        hidden_states_windows = window_partition(
-            shifted_hidden_states, self.window_size
-        )
+        hidden_states_windows = window_partition(shifted_hidden_states, self.window_size)
         hidden_states_windows = hidden_states_windows.view(
             -1, self.window_size * self.window_size, channels
         )
+        
+        # Get attention mask (cached when possible)
         attn_mask = self.get_attn_mask(height_pad, width_pad, dtype=hidden_states.dtype)
         if attn_mask is not None:
             attn_mask = attn_mask.to(hidden_states_windows.device)
-
+            
         attention_outputs = self.attention(
             hidden_states_windows,
             attn_mask,
             head_mask,
             output_attentions=output_attentions,
         )
-
         attention_output = attention_outputs[0]
-
+        
+        # Reconstruct feature map
         attention_windows = attention_output.view(
             -1, self.window_size, self.window_size, channels
         )
         shifted_windows = window_reverse(
             attention_windows, self.window_size, height_pad, width_pad
         )
-
-        # reverse cyclic shift
+        
+        # Reverse cyclic shift if needed
         if self.shift_size > 0:
             attention_windows = torch.roll(
                 shifted_windows, shifts=(self.shift_size, self.shift_size), dims=(1, 2)
             )
         else:
             attention_windows = shifted_windows
-
+            
+        # Handle padding if necessary
         was_padded = pad_values[3] > 0 or pad_values[5] > 0
         if was_padded:
             attention_windows = attention_windows[:, :height, :width, :].contiguous()
-
+            
         attention_windows = attention_windows.view(batch_size, height * width, channels)
-        hidden_states = self.layernorm_before(attention_windows, time)
-        hidden_states = shortcut + self.drop_path(hidden_states)
-
-        layer_output = self.intermediate(hidden_states)
-        layer_output = self.output(layer_output)
-        layer_output = hidden_states + self.drop_path(
-            self.layernorm_after(layer_output, time)
-        )
-
+        
+        hidden_states = shortcut + self.drop_path(self.layernorm_before(attention_windows, time))
+        
+        residual = hidden_states
+        layer_output = self.output(self.intermediate(hidden_states))
+        layer_output = residual + self.drop_path(self.layernorm_after(layer_output, time))
+        
         layer_outputs = (
             (layer_output, attention_outputs[1])
             if output_attentions
